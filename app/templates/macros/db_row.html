@@ -1,0 +1,15 @@
+{% macro db_row(id, name, role, status) %}
+<div class="row" data-id="{{ id }}">
+  <span class="cell cell--id">{{ '%02d' % id }}</span>
+
+  <span class="cell" contenteditable="true" spellcheck="false">{{ name }}</span>
+  <span class="cell" contenteditable="true" spellcheck="false">{{ role }}</span>
+
+  <span class="cell cell--status"
+        contenteditable="true"
+        spellcheck="false"
+        data-s="{{ status }}">{{ status }}</span>
+
+  <button type="button" class="row__del" title="Удалить строку">&times;</button>
+</div>
+{% endmacro %}

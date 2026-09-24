@@ -1,18 +1,16 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock %}</title>
-    {% block header_extras %}{% endblock %}
-    <style>
-        body{
-            background-color: lime;
-        }
-    </style>
-</head>
-<body>
-    {% block body %}
-    {% endblock %}
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{{ url_for('static', path='css/panels/auth.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/panels/db.css') }}">
+{% endblock %}
+
+{% block panels %}
+  {% include "partials/auth_panel.html" %}
+  {% include "partials/db_panel.html" %}
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', path='js/auth.js') }}" defer></script>
+  <script src="{{ url_for('static', path='js/db.js') }}" defer></script>
+{% endblock %}

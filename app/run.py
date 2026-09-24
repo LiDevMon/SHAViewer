@@ -15,8 +15,8 @@ if __name__ == "__main__":
     main_window = webview.create_window(
         title="Test",
         url="http://localhost:2000",
-        width=640,
-        height=480,
+        min_size=(1024, 650),
+        fullscreen=False,
         resizable=True
     )
 

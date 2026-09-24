@@ -1,0 +1,18 @@
+/* Палитра правой панели */
+.pane--db {
+  --bg:        #08130f;
+  --panel:     #0b1a17;
+  --panel-2:   #10241f;
+  --line:      #1c3a33;
+  --line-soft: #122a25;
+  --fg:        #a8e0cc;
+  --dim:       #5d8a7c;
+  --accent:    #8fe6c4;
+  --accent-ink:#04120d;
+
+  background:
+    radial-gradient(130% 100% at 50% 100%,
+      #10241f 0%, #08130f 55%, #050d0b 100%);
+}
+
+.pane--db .window { width: min(620px, 100%); }

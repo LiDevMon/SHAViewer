@@ -1,0 +1,43 @@
+{# ---------- Общее окно в стиле терминала ---------- #}
+{% macro window(title, mod='') %}
+<div class="window {{ mod }}">
+  <div class="bar">
+    <span class="dots"><i></i><i></i><i></i></span>
+    <span class="bar__title">{{ title }}</span>
+  </div>
+  <div class="window__body">
+    {{ caller() }}
+  </div>
+</div>
+{% endmacro %}
+
+
+{# ---------- Таб ---------- #}
+{% macro tab(label, mode, active=False) %}
+<button type="button"
+        class="tab{% if active %} is-active{% endif %}"
+        data-mode="{{ mode }}">{{ label }}</button>
+{% endmacro %}
+
+
+{# ---------- Поле ввода с префиксом ">" ---------- #}
+{% macro field(label, name, type='text', placeholder='', extra_class='', required=False) %}
+<label class="field {{ extra_class }}">
+  <span class="field__label">{{ label }}</span>
+  <span class="field__box">
+    <span class="field__prompt">&gt;</span>
+    <input type="{{ type }}"
+           name="{{ name }}"
+           placeholder="{{ placeholder }}"
+           {% if required %}required{% endif %}>
+  </span>
+</label>
+{% endmacro %}
+
+
+{# ---------- Пиксельная кнопка ---------- #}
+{% macro button(label, id='', variant='') %}
+<button type="submit" class="btn {{ variant }}"{% if id %} id="{{ id }}"{% endif %}>
+  {{ label }}
+</button>
+{% endmacro %}

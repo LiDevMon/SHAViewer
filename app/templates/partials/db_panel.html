@@ -1,0 +1,49 @@
+{% from "macros/ui.html" import window %}
+{% from "macros/db_row.html" import db_row %}
+
+{#- Начальные данные. В реальном приложении — из бэкенда через render_template. -#}
+{% set initial_records = records if records is defined else [
+    {'name': 'root',   'role': 'admin',   'status': 'ACTIVE'},
+    {'name': 'guest',  'role': 'viewer',  'status': 'IDLE'},
+    {'name': 'daemon', 'role': 'service', 'status': 'ACTIVE'},
+    {'name': 'backup', 'role': 'system',  'status': 'LOCKED'}
+] %}
+
+<section class="pane pane--db">
+  {% call window('db.explorer', mod='console') %}
+
+    <div class="console__toolbar">
+      <span class="q">SELECT * FROM <b>records</b>;</span>
+      <span class="count" id="rowCount">{{ '%02d' % initial_records | length }} rows</span>
+    </div>
+
+    <div class="grid">
+      <div class="grid__head">
+        <span>ID</span>
+        <span>NAME</span>
+        <span>PASSWD</span>
+        <span>STATUS</span>
+        <span></span>
+      </div>
+
+      <div class="grid__body" id="rows">
+        {% for rec in initial_records %}
+          {{ db_row(loop.index, rec.name, rec.role, rec.status) }}
+        {% endfor %}
+      </div>
+    </div>
+
+    <form class="insert" id="insertForm" autocomplete="off">
+      <span class="insert__prompt">INSERT&gt;</span>
+      <input class="inp" id="newName" type="text" placeholder="name" required>
+      <input class="inp" id="newPasswd" type="text" placeholder="passwd" required>
+      <select class="inp" id="newStatus">
+        <option>ACTIVE</option>
+        <option>IDLE</option>
+        <option>LOCKED</option>
+      </select>
+      <button class="btn--sm" type="submit" title="Добавить строку">+</button>
+    </form>
+
+  {% endcall %}
+</section>

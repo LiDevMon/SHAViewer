@@ -1,0 +1,17 @@
+/* Палитра левой панели */
+.pane--auth {
+  --bg:        #0a120d;
+  --panel:     #0e1a12;
+  --panel-2:   #12241a;
+  --line:      #1e3527;
+  --line-soft: #14261a;
+  --fg:        #b6e3b0;
+  --dim:       #5f8a68;
+  --accent:    #9ff0a0;
+  --accent-ink:#06110a;
+
+  background:
+    radial-gradient(130% 100% at 50% 0%,
+      #12251a 0%, #0a120d 55%, #060d09 100%);
+  border-right: var(--px) solid var(--line);
+}

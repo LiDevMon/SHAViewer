@@ -1,0 +1,330 @@
+/* ============================================================
+   ОБЩИЕ КОМПОНЕНТЫ: ОКНО, БАР, ТАБЫ, ПОЛЯ, КНОПКИ, ТАБЛИЦА
+   ============================================================ */
+
+/* ---------------- окно ---------------- */
+.window {
+  width: min(440px, 100%);
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 20, 14, .88);
+  border: var(--px) solid var(--line);
+  box-shadow:
+    0 0 0 var(--px) #060d09,
+    8px 8px 0 rgba(0,0,0,.45),
+    0 0 40px rgba(159,240,160,.07);
+}
+
+.window__body {
+  padding: 18px 18px 22px;
+  overflow-y: auto;
+}
+
+/* ---------------- верхняя полоса ---------------- */
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--panel-2);
+  border-bottom: var(--px) solid var(--line);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  letter-spacing: .06em;
+  color: var(--dim);
+}
+.dots { display: flex; gap: 4px; }
+.dots i {
+  display: block;
+  width: 8px;
+  height: 8px;
+  background: var(--line);
+}
+.dots i:nth-child(1) { background: #4c7a55; }
+.dots i:nth-child(2) { background: #3a5f45; }
+.dots i:nth-child(3) { background: #2a4634; }
+.bar__title { margin-left: auto; margin-right: auto; padding-left: 34px; }
+
+/* ---------------- мигающий курсор ---------------- */
+.blink {
+  display: inline-block;
+  width: 8px;
+  height: 11px;
+  background: currentColor;
+  vertical-align: -1px;
+  animation: blink 1s steps(1, end) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ---------------- системная строка ---------------- */
+.sysline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: .06em;
+  color: var(--dim);
+  padding-bottom: 12px;
+  border-bottom: var(--px) dashed var(--line-soft);
+}
+.sysline__mark { color: var(--accent); }
+.sysline__ver  { margin-left: auto; color: #3d5c47; }
+
+.prompt {
+  margin: 14px 0 0;
+  color: var(--dim);
+  font-size: 19px;
+}
+.prompt b { color: var(--accent); font-weight: normal; }
+
+/* ---------------- табы ---------------- */
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 14px 0 18px;
+}
+.tab {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  letter-spacing: .06em;
+  padding: 11px 6px;
+  color: var(--dim);
+  background: transparent;
+  border: var(--px) solid var(--line);
+  cursor: pointer;
+}
+.tab:hover { color: var(--fg); border-color: #2f5a3e; }
+.tab.is-active {
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 3px 3px 0 rgba(159,240,160,.18);
+}
+
+/* ---------------- поля ---------------- */
+.field { display: block; margin-bottom: 14px; }
+.field__label {
+  display: block;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: .08em;
+  color: var(--dim);
+  margin-bottom: 6px;
+}
+.field__box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(0,0,0,.38);
+  border: var(--px) solid var(--line);
+}
+.field__box:focus-within {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px rgba(159,240,160,.18);
+}
+.field__prompt { color: var(--accent); font-size: 20px; }
+.field input {
+  flex: 1; min-width: 0;
+  background: transparent;
+  border: 0; outline: 0;
+  color: var(--fg);
+  font-family: var(--font-term);
+  font-size: 20px;
+  letter-spacing: .04em;
+  caret-color: var(--accent);
+}
+.field input::placeholder { color: #3d5c47; }
+
+/* режим формы */
+.form[data-mode="login"] .only-register { display: none; }
+
+/* ---------------- кнопки ---------------- */
+.btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 15px;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  letter-spacing: .08em;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border: var(--px) solid var(--accent);
+  cursor: pointer;
+  box-shadow: 4px 4px 0 rgba(0,0,0,.5);
+}
+.btn:hover  { filter: brightness(1.08); }
+.btn:active { transform: translate(4px, 4px); box-shadow: none; }
+
+.btn--sm {
+  width: 100%;
+  padding: 8px 0;
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border: var(--px) solid var(--accent);
+  cursor: pointer;
+}
+.btn--sm:active { transform: translate(2px, 2px); }
+
+.statusline {
+  margin-top: 14px;
+  min-height: 20px;
+  font-size: 18px;
+  color: var(--dim);
+}
+.statusline b { color: var(--accent); font-weight: normal; }
+
+/* ---------------- таблица ---------------- */
+.console {
+  width: min(620px, 100%);
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  background: rgba(11, 26, 23, .9);
+  border: var(--px) solid var(--line);
+  box-shadow:
+    0 0 0 var(--px) #04100c,
+   -8px 8px 0 rgba(0,0,0,.45),
+    0 0 44px rgba(143,230,196,.07);
+}
+
+.console__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  font-size: 18px;
+  color: var(--dim);
+  border-bottom: var(--px) solid var(--line-soft);
+}
+.console__toolbar .q { color: var(--accent); }
+.console__toolbar .count {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: .06em;
+  color: var(--dim);
+}
+
+.grid { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+
+.grid__head,
+.row {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1.2fr) minmax(0, 1fr) 92px 30px;
+  gap: 8px;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.grid__head {
+  padding-top: 10px; padding-bottom: 10px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: .06em;
+  color: var(--dim);
+  background: rgba(0,0,0,.28);
+  border-bottom: var(--px) solid var(--line);
+}
+
+.grid__body {
+  flex: 1; min-height: 0;
+  max-height: 44vh;
+  overflow-y: auto;
+}
+
+.row {
+  min-height: 42px;
+  font-size: 19px;
+  color: var(--fg);
+  border-bottom: 1px dashed var(--line-soft);
+}
+.row:hover { background: rgba(143,230,196,.06); }
+
+.cell {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  outline: 0;
+}
+.cell:empty::before { content: "—"; color: var(--dim); }
+.cell--id {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--accent);
+}
+.cell[contenteditable]:focus {
+  background: rgba(143,230,196,.1);
+  outline: 1px dashed var(--accent);
+  outline-offset: 2px;
+}
+.cell--status[data-s="ACTIVE"] { color: var(--accent); }
+.cell--status[data-s="IDLE"]   { color: #d6e08f; }
+.cell--status[data-s="LOCKED"] { color: #e0a08f; }
+
+.row__del {
+  width: 24px; height: 24px;
+  padding: 0;
+  font-family: var(--font-term);
+  font-size: 18px;
+  line-height: 1;
+  color: var(--dim);
+  background: transparent;
+  border: var(--px) solid transparent;
+  cursor: pointer;
+}
+.row__del:hover { color: #ff9d8a; border-color: #4a2a26; }
+
+/* ---------------- строка вставки ---------------- */
+.insert {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) 92px 40px;
+  gap: 8px;
+  align-items: center;
+  padding: 12px;
+  background: rgba(0,0,0,.32);
+  border-top: var(--px) solid var(--line);
+}
+.insert__prompt {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: .06em;
+  color: var(--accent);
+}
+.inp {
+  width: 100%; min-width: 0;
+  padding: 7px 8px;
+  font-family: var(--font-term);
+  font-size: 18px;
+  color: var(--fg);
+  background: rgba(0,0,0,.45);
+  border: var(--px) solid var(--line);
+  outline: 0;
+  caret-color: var(--accent);
+}
+.inp:focus { border-color: var(--accent); }
+.inp::placeholder { color: #3a5c52; }
+select.inp { appearance: none; cursor: pointer; }
+select.inp option { background: #0b1a17; color: #a8e0cc; }
+
+/* скроллбары */
+.grid__body::-webkit-scrollbar,
+.window__body::-webkit-scrollbar { width: 10px; }
+.grid__body::-webkit-scrollbar-track,
+.window__body::-webkit-scrollbar-track { background: #071310; }
+.grid__body::-webkit-scrollbar-thumb,
+.window__body::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border: 2px solid #071310;
+}
+
+@media (max-width: 560px) {
+  .insert { grid-template-columns: 1fr 1fr; }
+  .insert__prompt { grid-column: 1 / -1; }
+  .btn--sm { grid-column: 1 / -1; }
+}

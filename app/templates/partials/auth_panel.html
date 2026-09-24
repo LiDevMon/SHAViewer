@@ -1,0 +1,34 @@
+{% from "macros/ui.html" import window, tab, field, button %}
+
+<section class="pane pane--auth">
+  {% call window('auth@SHAViewer:~') %}
+
+    <div class="sysline">
+      <span class="sysline__mark">▚</span>
+      <span>{{ sys.name | default('SHAViewer') }}</span>
+      <span class="sysline__ver">{{ sys.version | default('v1.0') }}</span>
+    </div>
+
+    <p class="prompt"><b>&gt;</b> system active. Analize...<span class="blink"></span></p>
+
+    <div class="tabs">
+      {{ tab('ВХОД',       'login',    active=True) }}
+      {{ tab('РЕГИСТРАЦИЯ', 'register', active=False) }}
+    </div>
+
+    <form class="form" id="authForm" data-mode="login" autocomplete="off">
+      {{ field('ЛОГИН', 'username', placeholder='root', required=True) }}
+      {{ field('ПОЧТА',    'email',    type='email',
+               placeholder='lidevmon@author.ru', extra_class='only-register') }}
+      {{ field('ПАРОЛЬ', 'password', type='password',
+               placeholder='••••••••', required=True) }}
+      {{ field('ПОДТВЕРДИТЕ ПАРОЛЬ', 'confirm', type='password',
+               placeholder='••••••••', extra_class='only-register') }}
+
+      {{ button('ВОЙТИ', id='submitLabel') }}
+
+      <div class="statusline" id="authStatus"></div>
+    </form>
+
+  {% endcall %}
+</section>

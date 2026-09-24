@@ -1,0 +1,93 @@
+/* ============================================================
+   БАЗА / RESET / ПЕРЕМЕННЫЕ
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --px: 2px;
+  --font-pixel: 'Press Start 2P', 'Courier New', monospace;
+  --font-term:  'VT323', 'Courier New', monospace;
+}
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: #050b08;
+  font-family: var(--font-term);
+  font-size: 20px;
+  line-height: 1.25;
+  overflow: hidden;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+/* ---------------- SPLIT ---------------- */
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100vh;
+  height: 100dvh;
+}
+
+.pane {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+}
+
+/* сетка-подложка */
+.pane::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--line-soft) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line-soft) 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: .45;
+}
+
+/* сканлайны */
+.pane::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0,0,0,.28) 0 1px,
+    rgba(0,0,0,0)   1px 3px
+  );
+  opacity: .6;
+}
+
+.pane > * { position: relative; z-index: 2; }
+
+/* ---------------- CANVAS ПОВЕРХ ВСЕГО ---------------- */
+#fx {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  pointer-events: none;
+  image-rendering: pixelated;
+}
+
+/* ---------------- АДАПТИВ ---------------- */
+@media (max-width: 960px) {
+  body { overflow: auto; }
+  .split { grid-template-columns: 1fr; height: auto; }
+  .pane { min-height: 100vh; padding: 16px; }
+  .pane--auth { border-right: 0; border-bottom: var(--px) solid var(--line); }
+  .window { max-height: none; }
+  .grid__body { max-height: 40vh; }
+}
