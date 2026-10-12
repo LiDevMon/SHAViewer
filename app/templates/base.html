@@ -16,13 +16,12 @@
 </head>
 
 <body>
-
   <main class="split">
     {% block panels %}{% endblock %}
   </main>
-
+  
   {# Canvas поверх всей страницы. pointer-events: none — клики проходят сквозь #}
-  <canvas id="fx"></canvas>
+  <canvas id="fx">{% block content %}{% endblock %}</canvas>
 
   <script src="{{ url_for('static', path='js/canvas.js') }}" defer></script>
   {% block scripts %}{% endblock %}
