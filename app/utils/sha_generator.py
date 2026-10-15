@@ -90,9 +90,6 @@ def sha_256(data): return keccak(1088, 512, data, 32, 0x06)
 if __name__ == "__main__":
     from hashlib import sha3_256
 
-    test = [b'password', b'123', b'Tesssst']
-
-  
     h1 = sha3_256(b'test').hexdigest()
     h2 = sha_256(b'test').hex()
 
