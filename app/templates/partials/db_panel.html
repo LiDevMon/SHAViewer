@@ -13,7 +13,7 @@
 
     <div class="grid">
       <div class="grid__head">
-        <span>ID</span><span>NAME</span><span>ROLE</span><span>STATUS</span><span></span>
+        <span>ID</span><span>NAME</span><span>PASSWD</span><span>STATUS</span><span></span>
       </div>
       <div class="grid__body" id="rows">
         {% for rec in initial_records %}
@@ -25,7 +25,7 @@
     <form class="insert" id="insertForm" autocomplete="off">
       <span class="insert__prompt">INSERT&gt;</span>
       <input class="inp" id="newName"   type="text" placeholder="name" required>
-      <input class="inp" id="newRole"   type="text" placeholder="role" required>
+      <input class="inp" id="newRole"   type="text" placeholder="passwd" required>
       <select class="inp" id="newStatus">
         <option>ACTIVE</option><option>IDLE</option><option>LOCKED</option>
       </select>

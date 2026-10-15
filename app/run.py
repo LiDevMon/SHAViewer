@@ -13,7 +13,7 @@ if __name__ == "__main__":
     server_thread.start()
 
     main_window = webview.create_window(
-        title="Test",
+        title="SHAViewer",
         url="http://localhost:2000",
         min_size=(1024, 650),
         fullscreen=False,

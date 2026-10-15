@@ -7,56 +7,49 @@
   const statusEl = document.getElementById('analysisStatus');
   const progEl   = document.getElementById('analysisProgress');
   const totalEl  = document.getElementById('analysisTotal');
-  if (!overlay || !grid) return;
+  const inputEl  = document.getElementById('hashInput');
 
-  /* ---------- демо-данные: шаги анализа ---------- */
-  const STEPS = [
-    {
-      code:  '01',
-      title: 'INPUT',
-      rows:  [['source', 'stdin'], ['length', '14 B'], ['mode', 'raw']],
-      hash:  'a94a8fe5ccb19ba61c4c0873d391e987982fbbd3...',
-      prog:  12,
-    },
-    {
-      code:  '02',
-      title: 'PADDING',
-      rows:  [['block', '512 bit'], ['append', '0x80'], ['zeros', '53 B']],
-      hash:  'e3b0c44298fc1c149afbf4c8996fb92427ae41e464...',
-      prog:  28,
-    },
-    {
-      code:  '03',
-      title: 'SCHEDULE',
-      rows:  [['words', '64'], ['rounds', '80'], ['rotate', 'rshift']],
-      hash:  '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b...',
-      prog:  46,
-    },
-    {
-      code:  '04',
-      title: 'COMPRESS',
-      rows:  [['state', 'H0..H7'], ['k', 'const'], ['mix', 'σ0, σ1']],
-      hash:  '7d3c1a9e0b5f4e8a2c6d9b1f3a5e8c0d4a1b6e2f...',
-      prog:  68,
-    },
-    {
-      code:  '05',
-      title: 'REDUCE',
-      rows:  [['Σ', 'mod 2^32'], ['feed', 'forward'], ['acc', 'additive']],
-      hash:  '2c26b46b68ffc68ff99b453c1d30413413422d7064...',
-      prog:  84,
-    },
-    {
-      code:  '06',
-      title: 'DIGEST',
-      rows:  [['bits', '256'], ['hex', '64 chars'], ['mode', 'final']],
-      hash:  '5d41402abc4b2a76b9719d911017c592ae1f2b3c4d...',
-      prog:  100,
-    },
-  ];
+  if(inputEl){
+    inputEl.addEventListener('change', () => {
+      if(!overlay.hidden){
+        open(inputEl.value);
+      }
+    });
+  }
+
+  if (!overlay || !grid) return;
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const pad2  = n => String(n).padStart(2, '0');
+
+  async function loadSteps(input = null) 
+  {
+    try
+    {
+      let url = '/static/data.json';
+      let options = {method: 'GET'};
+
+      if (input !== null)
+        {
+          url = '/static/data.json';
+          options = {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ input })
+          };
+        }
+        const res = await fetch(url, options);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json()
+    
+        STEPS = data.steps ?? data;
+        return true;
+    } catch (err) {
+      console.error('Не удалось загрузить шаги:', err);
+      statusEl.textContent = 'Ошибка загрузки данных';
+      return false;
+    }
+  }
 
   /* токен запуска: чтобы клик «закрыть» мог отменить анимацию */
   let runToken = 0;
@@ -148,13 +141,16 @@
   }
 
   /* ---------- открытие / закрытие ---------- */
-  function open() {
+  async function open(input = null) {
     overlay.hidden = false;
     overlay.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-
     runToken += 1;
     const token = runToken;
+
+    // Загружаем актуальные данные перед построением
+    const ok = await loadSteps(input);
+    if (!ok) return;
 
     const blocks = buildAll();
     play(blocks, token);
@@ -169,7 +165,10 @@
 
   /* ---------- обработчики ---------- */
   document.querySelectorAll('[data-analyze]').forEach(btn => {
-    btn.addEventListener('click', open);
+    btn.addEventListener('click', () => {
+      const val = inputEl ? inputEl.value : null;
+    open(val);
+    });
   });
   document.querySelectorAll('[data-analyze-close]').forEach(el => {
     el.addEventListener('click', close);
