@@ -18,7 +18,7 @@ def index(request:Request):
         request, 
         "index.html",
         {
-            "sys": {"name": "SHAViewer TERMINAL", "version": "v1.0"},
+            "sys": {"name": "SHAViewer TERMINAL", "version": "v1.4"},
         },
         )
 

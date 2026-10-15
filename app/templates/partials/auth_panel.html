@@ -1,15 +1,15 @@
 {% from "macros/ui.html" import window, tab, field, button %}
 
 <section class="pane pane--auth">
-  {% call window('auth@SHAViewer:~') %}
+  {% call window('auth@omarchy:~') %}
 
     <div class="sysline">
       <span class="sysline__mark">▚</span>
       <span>{{ sys.name | default('SHAViewer') }}</span>
-      <span class="sysline__ver">{{ sys.version | default('v1.0') }}</span>
+      <span class="sysline__ver">{{ sys.version if sys is defined and sys.version else 'v1.0.4' }}</span>
     </div>
 
-    <p class="prompt"><b>&gt;</b> system active. Analize...<span class="blink"></span></p>
+    <p class="prompt"><b>&gt;</b> system ready. await credentials<span class="blink"></span></p>
 
     <div class="tabs">
       {{ tab('ВХОД',       'login',    active=True) }}
@@ -19,17 +19,23 @@
     <form class="form" id="authForm" data-mode="login" autocomplete="off">
       {{ field('ЛОГИН', 'username', placeholder='root', required=True) }}
       {{ field('ПОЧТА',    'email',    type='email',
-               placeholder='lidevmon@author.ru', extra_class='only-register') }}
+               placeholder='user@omarchy.org', extra_class='only-register') }}
       {{ field('ПАРОЛЬ', 'password', type='password',
                placeholder='••••••••', required=True) }}
       {{ field('ПОДТВЕРДИТЕ ПАРОЛЬ', 'confirm', type='password',
                placeholder='••••••••', extra_class='only-register') }}
 
       {{ button('ВОЙТИ', id='submitLabel') }}
-      {{ button('АНАЛИЗ', id='analize', variant="analize/") }}
 
       <div class="statusline" id="authStatus"></div>
     </form>
+
+    <div class="analyze-wrap">
+      <button type="button" class="btn btn--ghost" data-analyze>
+        <span class="analyze-wrap__icon">▶</span> ЗАПУСТИТЬ АНАЛИЗ
+      </button>
+      <span class="analyze-wrap__hint">trace --blocks --sha</span>
+    </div>
 
   {% endcall %}
 </section>

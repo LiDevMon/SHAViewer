@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block styles %}
-  <link rel="stylesheet" href="{{ url_for('static', path='css/panels/auth.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', path='css/panels/db.css') }}">
+  {{ super() }}
+  <link rel="stylesheet" href="/static/css/analize.css">
 {% endblock %}
 
 {% block panels %}
@@ -11,21 +11,18 @@
 {% endblock %}
 
 {% block content %}
-    <ul>
-      <li>
-        <div>{% source %}</div>
-        <div>{% encoded %}</div>
-        <div>{% blocks %}</div>
-        <div>{% step_1 %}</div>
-        <div>{% step_2 %}</div>
-        <div>{% step_3 %}</div>
-        <div>{% step_4 %}</div>
-        <div>{% step_5 %}</div>
-      </li>
-    </ul>
-{% endblock %}
-
-{% block scripts %}
-  <script src="{{ url_for('static', path='js/auth.js') }}" defer></script>
-  <script src="{{ url_for('static', path='js/db.js') }}" defer></script>
+<div class="analize-container">
+  <h2 class="analize-title">Путь трансформации</h2>
+  <div class="transformation-chain">
+    {% for step in data.steps %}
+      <div class="transformation-block {{ step.type }}">
+        <div class="block-title">{{ step.title }}</div>
+        <div class="block-value">{{ step.value }}</div>
+        {% if not loop.last %}
+          <div class="block-arrow">▼</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}

@@ -1,0 +1,290 @@
+/* ============================================================
+   ОВЕРЛЕЙ АНАЛИЗА — карта блоков
+   ============================================================ */
+
+.analysis {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;              /* ниже canvas (9999), выше панелей */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+
+  --bg:        #071009;
+  --panel:     #0c1a11;
+  --panel-2:   #12261a;
+  --line:      #1e3527;
+  --line-soft: #14261a;
+  --fg:        #c2eec0;
+  --dim:       #5f8a68;
+  --accent:    #a8f2a8;
+  --accent-2:  #d6e08f;
+  --accent-ink:#06110a;
+}
+
+.analysis[hidden] { display: none; }
+
+/* ---------- подложка ---------- */
+.analysis__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 8, 5, .84);
+}
+.analysis__backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, .35) 0 1px,
+    transparent 1px 3px
+  );
+  opacity: .7;
+}
+
+/* ---------- окно ---------- */
+.analysis__window {
+  position: relative;
+  width: min(1080px, 100%);
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+
+  background: rgba(10, 20, 14, .96);
+  border: var(--px) solid var(--line);
+  box-shadow:
+    0 0 0 var(--px) #060d09,
+    10px 10px 0 rgba(0, 0, 0, .55),
+    0 0 60px rgba(159, 240, 160, .12);
+
+  animation: analysis-in .18s steps(2, end);
+}
+
+@keyframes analysis-in {
+  from { transform: translateY(-8px); opacity: .55; }
+  to   { transform: translateY(0);    opacity: 1;   }
+}
+
+/* крестик закрытия — в баре справа */
+.analysis__close {
+  margin-left: auto;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font-family: var(--font-term);
+  font-size: 20px;
+  line-height: 1;
+  color: var(--dim);
+  background: transparent;
+  border: var(--px) solid transparent;
+  cursor: pointer;
+}
+.analysis__close:hover { color: #ff9d8a; border-color: #4a2a26; }
+
+/* ---------- тело ---------- */
+.analysis__body {
+  padding: 18px;
+  overflow-y: auto;
+}
+.analysis__body::-webkit-scrollbar { width: 10px; }
+.analysis__body::-webkit-scrollbar-track { background: #071310; }
+.analysis__body::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border: 2px solid #071310;
+}
+
+.analysis__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: var(--px) dashed var(--line-soft);
+  font-size: 19px;
+  color: var(--dim);
+}
+.analysis__prompt b { color: var(--accent); font-weight: normal; }
+.analysis__progress {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  letter-spacing: .08em;
+  color: var(--accent);
+}
+
+/* ---------- сетка блоков ---------- */
+.analysis__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  min-height: 180px;
+}
+
+.block {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+
+  background: rgba(0, 0, 0, .4);
+  border: var(--px) solid var(--line);
+
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity  .18s steps(3, end),
+    transform .18s steps(3, end),
+    border-color .15s linear,
+    box-shadow .15s linear;
+}
+.block.is-on { opacity: 1; transform: translateY(0); }
+
+.block.is-active {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 var(--px) rgba(168, 242, 168, .14),
+    inset 0 0 24px rgba(168, 242, 168, .06);
+}
+.block.is-done { border-color: #2f5a3e; }
+
+/* ---------- шапка блока ---------- */
+.block__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--line-soft);
+
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: .08em;
+  color: var(--dim);
+}
+.block__step { color: var(--accent); }
+
+.block__title {
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  letter-spacing: .06em;
+  color: var(--fg);
+}
+
+/* ---------- строки "ключ → значение" ---------- */
+.block__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+.block__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 17px;
+  line-height: 1.2;
+}
+.block__row dt { color: var(--dim); }
+.block__row dd {
+  margin: 0;
+  max-width: 62%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- «хеш» ---------- */
+.block__hash {
+  min-height: 46px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, .5);
+  border: 1px dashed var(--line);
+
+  font-size: 15px;
+  letter-spacing: .04em;
+  line-height: 1.25;
+  color: var(--accent-2);
+  word-break: break-all;
+}
+
+/* ---------- полоса прогресса ---------- */
+.block__bar {
+  height: 6px;
+  background: rgba(0, 0, 0, .5);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.block__bar > i {
+  display: block;
+  width: 0%;
+  height: 100%;
+  background: var(--accent);
+  transition: width .35s steps(8, end);
+}
+
+/* ---------- подвал ---------- */
+.analysis__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: var(--px) dashed var(--line-soft);
+
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  letter-spacing: .08em;
+  color: var(--dim);
+}
+.analysis__foot .ok { color: var(--accent); }
+
+/* ============================================================
+   КНОПКА АНАЛИЗА — под формами
+   ============================================================ */
+.analyze-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: var(--px) dashed var(--line-soft);
+}
+.analyze-wrap--db { margin-top: 12px; }
+
+.analyze-wrap__icon {
+  display: inline-block;
+  margin-right: 8px;
+  color: currentColor;
+  transform: translateY(-1px);
+}
+
+.analyze-wrap__hint {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  letter-spacing: .08em;
+  color: var(--dim);
+  text-align: center;
+}
+
+/* ghost-кнопка: контурная, в тон */
+.btn--ghost {
+  color: var(--accent);
+  background: transparent;
+  border-color: var(--accent);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, .5);
+}
+.btn--ghost:hover { background: rgba(159, 240, 160, .08); }
+
+/* ============================================================
+   АДАПТИВ
+   ============================================================ */
+@media (max-width: 560px) {
+  .analysis { padding: 12px; }
+  .analysis__grid { grid-template-columns: 1fr; }
+  .block__row dd { max-width: 55%; }
+}

@@ -1,0 +1,27 @@
+<div class="analysis" id="analysis" hidden aria-hidden="true" role="dialog" aria-modal="true">
+  <div class="analysis__backdrop" data-analyze-close></div>
+
+  <div class="analysis__window">
+    <div class="bar">
+      <span class="dots"><i></i><i></i><i></i></span>
+      <span class="bar__title">SHAViewer:~/trace</span>
+      <button type="button" class="analysis__close" data-analyze-close aria-label="Закрыть">×</button>
+    </div>
+
+    <div class="analysis__body">
+      <div class="analysis__head">
+        <span class="analysis__prompt">&gt; trace --blocks --sha <b>records</b></span>
+        <span class="analysis__progress">
+          <span id="analysisProgress">00</span>&nbsp;/&nbsp;<span id="analysisTotal">00</span>
+        </span>
+      </div>
+
+      <div class="analysis__grid" id="analysisGrid"></div>
+
+      <div class="analysis__foot">
+        <span id="analysisStatus">idle</span>
+        <span class="blink"></span>
+      </div>
+    </div>
+  </div>
+</div>

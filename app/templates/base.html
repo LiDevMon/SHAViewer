@@ -11,19 +11,25 @@
 
   <link rel="stylesheet" href="{{ url_for('static', path='css/base.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', path='css/components.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', path='css/analysis.css') }}">
 
   {% block styles %}{% endblock %}
 </head>
 
 <body>
+
   <main class="split">
     {% block panels %}{% endblock %}
   </main>
-  
+
+  {# ---- Оверлей анализа (карта блоков) ---- #}
+  {% include "partials/analysis.html" %}
+
   {# Canvas поверх всей страницы. pointer-events: none — клики проходят сквозь #}
-  <canvas id="fx">{% block content %}{% endblock %}</canvas>
+  <canvas id="fx"></canvas>
 
   <script src="{{ url_for('static', path='js/canvas.js') }}" defer></script>
+  <script src="{{ url_for('static', path='js/analysis.js') }}" defer></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

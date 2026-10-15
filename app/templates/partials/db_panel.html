@@ -1,49 +1,44 @@
 {% from "macros/ui.html" import window %}
 {% from "macros/db_row.html" import db_row %}
 
-{#- Начальные данные. В реальном приложении — из бэкенда через render_template. -#}
-{% set initial_records = records if records is defined else [
-    {'name': 'root',   'role': 'admin',   'status': 'ACTIVE'},
-    {'name': 'guest',  'role': 'viewer',  'status': 'IDLE'},
-    {'name': 'daemon', 'role': 'service', 'status': 'ACTIVE'},
-    {'name': 'backup', 'role': 'system',  'status': 'LOCKED'}
-] %}
+{% set initial_records = records if records is defined else [] %}
 
 <section class="pane pane--db">
   {% call window('db.explorer', mod='console') %}
 
     <div class="console__toolbar">
-      <span class="q">SELECT * FROM <b>database</b>;</span>
+      <span class="q">SELECT * FROM <b>records</b>;</span>
       <span class="count" id="rowCount">{{ '%02d' % initial_records | length }} rows</span>
     </div>
 
     <div class="grid">
       <div class="grid__head">
-        <span>ID</span>
-        <span>NAME</span>
-        <span>PASSWD</span>
-        <span>STATUS</span>
-        <span></span>
+        <span>ID</span><span>NAME</span><span>ROLE</span><span>STATUS</span><span></span>
       </div>
-
       <div class="grid__body" id="rows">
         {% for rec in initial_records %}
-          {{ db_row(loop.index, rec.name, rec.role, rec.status) }}
+          {{ db_row(rec.id, rec.name, rec.role, rec.status) }}
         {% endfor %}
       </div>
     </div>
 
     <form class="insert" id="insertForm" autocomplete="off">
       <span class="insert__prompt">INSERT&gt;</span>
-      <input class="inp" id="newName" type="text" placeholder="name" required>
-      <input class="inp" id="newPasswd" type="text" placeholder="passwd" required>
+      <input class="inp" id="newName"   type="text" placeholder="name" required>
+      <input class="inp" id="newRole"   type="text" placeholder="role" required>
       <select class="inp" id="newStatus">
-        <option>ACTIVE</option>
-        <option>IDLE</option>
-        <option>LOCKED</option>
+        <option>ACTIVE</option><option>IDLE</option><option>LOCKED</option>
       </select>
       <button class="btn--sm" type="submit" title="Добавить строку">+</button>
     </form>
+
+    {# ---- Кнопка анализа ---- #}
+    <div class="analyze-wrap analyze-wrap--db">
+      <button type="button" class="btn btn--ghost" data-analyze>
+        <span class="analyze-wrap__icon">▶</span> ЗАПУСТИТЬ АНАЛИЗ
+      </button>
+      <span class="analyze-wrap__hint">trace --blocks --sha</span>
+    </div>
 
   {% endcall %}
 </section>
