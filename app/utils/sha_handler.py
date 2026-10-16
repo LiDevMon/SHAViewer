@@ -17,14 +17,15 @@ class StepFabricator:
         )
 
     def convert_steps(self):
+        prog_by_block = round(100 / len(self.steps), 3)
         for i in range(len(self.steps)):
-            self.steps[i]['prog'] = round(100 / len(self.steps), 3)
+            all_sum = sum([x['prog'] for x in self.steps])
+
+            self.steps[i]['prog'] = round((prog_by_block * (i+1))) if i != 0 else prog_by_block
             
             if(i == len(self.steps)-1):
-                all_sum = sum([x['prog'] for x in self.steps])
-
-                if(all_sum != 100):
-                    self.steps[i]['prog'] += 100 - all_sum
+                if(all_sum < 100):
+                    self.steps[i]['prog'] = 100
                     
 
         data = {

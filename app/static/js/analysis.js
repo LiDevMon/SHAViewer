@@ -1,7 +1,9 @@
 /* ============================================================
    АНАЛИЗ — карта блоков поверх страницы
    ============================================================ */
-(() => {
+  let STEPS = [];
+
+   (() => {
   const overlay  = document.getElementById('analysis');
   const grid     = document.getElementById('analysisGrid');
   const statusEl = document.getElementById('analysisStatus');
@@ -22,28 +24,25 @@
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const pad2  = n => String(n).padStart(2, '0');
 
-  async function loadSteps(input = null) 
-  {
-    try
-    {
-      let url = '/static/data.json';
-      let options = {method: 'GET'};
+  async function loadSteps(input = null) {
+    const hasInput = input !== null && String(input).trim() !== '';
 
-      if (input !== null)
-        {
-          url = '/static/data.json';
-          options = {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ input })
-          };
+    const url = hasInput ? '/api/analyze' : '/static/data.json';
+    const options = hasInput
+      ? {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ input })
         }
-        const res = await fetch(url, options);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json()
-    
-        STEPS = data.steps ?? data;
-        return true;
+      : { method: 'GET' };
+
+    try {
+      const res = await fetch(url, options);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      STEPS = data.steps ?? data;
+      return true;
     } catch (err) {
       console.error('Не удалось загрузить шаги:', err);
       statusEl.textContent = 'Ошибка загрузки данных';
@@ -79,17 +78,11 @@
   /* ---------- печать хеша «по буквам» ---------- */
   function typeHash(el, full, token) {
     return new Promise(resolve => {
-      el.textContent = '';
-      let i = 0;
-      const tick = () => {
-        if (token !== runToken) return resolve();
-        if (i >= full.length) return resolve();
-        el.textContent = full.slice(0, ++i);
-        setTimeout(tick, 10);
-      };
-      tick();
+      if (token !== runToken) return resolve();
+      el.textContent = full;
+      resolve();
     });
-  }
+}
 
   /* ---------- сборка «скелета» всех блоков ---------- */
   function buildAll() {
@@ -115,7 +108,6 @@
       const block = blocks[i];
 
       block.classList.add('is-on');
-      await sleep(80);
       if (token !== runToken) return;
 
       block.classList.add('is-active');
@@ -127,7 +119,6 @@
 
       /* прогресс-бар */
       block.querySelector('.block__bar > i').style.width = step.prog + '%';
-      await sleep(180);
       if (token !== runToken) return;
 
       block.classList.remove('is-active');

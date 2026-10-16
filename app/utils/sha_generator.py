@@ -1,4 +1,7 @@
-from sha_handler import StepFabricator 
+try:
+    from utils.sha_handler import StepFabricator 
+except ImportError:
+    from sha_handler import StepFabricator 
 
 handler = StepFabricator()
 
@@ -24,57 +27,66 @@ def keccak_f(state:list) -> list:
             C[x] = state[x] ^ state[x+5] ^ state[x+10] ^ state[x+15] ^ state[x+20]
             
         handler.add_step(
-            f"Шаг θ, раунд {x}. Определение чётности столбца X", 
+            f"Шаг θ. Определение чётности столбца X", 
             [
                 ["Формула:", "state[x] XOR state[x+5] XOR state[x+10] XOR state[x+15] XOR state[x+20]"],
-                ["Полученное значение:", f'{C[x]:b}']
-            ])
+                ["Полученное значение:", ""]
+            ],
+            f'{C[x]:b}')
         for x in range(5):
             D = C[(x-1) % 5] ^ cycle_shift(C[(x+1) % 5], 1)
             for y in range(5):
                 state[x + 5*y] ^= D
-                handler.add_step(
-                                f"Шаг θ, раунд {x}. Влияние соседних столбцов", 
-                                [
-                                    ["Формула для маски:", "C[(x-1) % 5] XOR cycle_shift(C[(x+1) % 5], 1)"],
-                                    ["Маска:", f'{D:b}'],
-                                    ["Формула изменения состояния:", "state[x + 5*y] XOR D"],
-                                    ["Полученное значение:", f'{state[x + 5*y]:b}']
-                                ])
+        handler.add_step(
+                        f"Шаг θ. Влияние соседних столбцов", 
+                        [
+                            ["Формула для маски:", "C[(x-1) % 5] XOR cycle_shift(C[(x+1) % 5], 1)"],
+                            ["Маска:", f'{D:b}'],
+                            ["Формула изменения состояния:", "state[x + 5*y] XOR D"],
+                            ["Полученное значение:", ""]
+                        ], 
+                        f'{state[x + 5*y]:b}')
 
         B = [0] * 25
         for x in range(5):
             for y in range(5):
                 B[y+5*((2*x + 3*y) % 5)] = cycle_shift(state[x + 5*y], ROTATIONS[x][y])
-                handler.add_step(
-                    "Шаг ρ и π. Перемешивание массива байт",
-                    [
-                        ["Смешенная последовательность байт", f'{B[y+5*((2*x + 3*y) % 5)]:b}']
-                    ]
-                )
+        handler.add_step(
+            "Шаг ρ и π. Перемешивание массива байт",
+            [
+                ["Смешенная последовательность байт", ""]
+            ], 
+            f'{B[y+5*((2*x + 3*y) % 5)]:b}'
+        )
 
         for x in range(5):
             for y in range(5):
                 state[x + 5*y] = (B[x+5*y] ^ 
                                   (((~B[(x+1) % 5 + 5*y]) & MASK) & 
                                    B[(x+2) % 5 + 5*y])) & MASK
-                handler.add_step(
-                    "Нелинейное перемешивание по строкам",
-                    [
-                        [f"Состояние для x = {x}, y = {y}", f'{state[x + 5*y]:b}']
-                    ],
-                    str(state[x + 5*y])
-                )
+        handler.add_step(
+            "Шаг χ. Нелинейное перемешивание по строкам",
+            [
+                [f"Состояние для x = {x}, y = {y}", ""]
+            ],
+            f'{state[x + 5*y]:b}'
+        )
         state[0] ^= RC[rnd]
         handler.add_step(
-            f"Добавление раундовой константы для нарушения симметрии (раунд = {rnd})",
+            f"Шаг ι. Добавление раундовой константы для нарушения симметрии (раунд = {rnd})",
             [
                 ["Формула:", "state[0] XOR RC[rnd]"]
             ],
             f'{state[0]:b}'
             )
 
-    handler.add_step("Функция Keccak", [["Входные данные:", [f'{x:b}' for x in input_state]], "Количество раундов:", "24"], [f'{x:b}' for x in state])
+    handler.add_step("Функция Keccak", [
+        ["Входные данные:", [f'{x:b}' for x in input_state]],
+        ["Количество раундов:", "24"],
+        ["Выходные данные:", ""]
+        ],
+        '\n'.join([f'{x:b}' for x in state])
+        )
 
     return state
 
@@ -85,7 +97,10 @@ def keccak(r,c, data, output_lenght, padding=0x06) -> bytes:
     msg = bytearray(data)
     handler.add_step(
         "Получение входных данных",
-        hash=str(msg.decode('utf-8'))
+        [
+            ["Входные данные:", ""]
+        ], 
+        str(msg.decode('utf-8'))
         )
     msg.append(padding)
 
@@ -97,7 +112,10 @@ def keccak(r,c, data, output_lenght, padding=0x06) -> bytes:
 
     handler.add_step(
         "Дополнение массива байт до нужной длины",
-        hash=str(msg.hex())
+        [
+            ["Дополненный массив", ""]
+        ],
+        str(msg.hex())
     )
     # Впитывание губочной функции
     for i in range(0, len(msg), r_bytes):
