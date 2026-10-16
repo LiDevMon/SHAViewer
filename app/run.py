@@ -19,4 +19,4 @@ if __name__ == "__main__":
         resizable=True
     )
 
-    webview.start()
+    webview.start(icon='static/favicon.ico')
