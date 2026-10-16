@@ -2,7 +2,6 @@ import webview
 import uvicorn as uv
 import threading
 
-
 from main import app
 
 def run_server():

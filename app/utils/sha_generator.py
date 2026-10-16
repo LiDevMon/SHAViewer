@@ -1,8 +1,12 @@
+from sha_handler import StepFabricator 
+
+handler = StepFabricator()
+
 def cycle_shift(data, n:int):
     n %= 64
     return ((data << n) | (data >> (64-n))) & MASK
 
-def rotate_martix(matrix:list) -> list:
+def rotate_martix() -> list:
     r = [[0]*5 for _ in range(5)]
     x,y = 1,0
     for i in range(24):
@@ -13,26 +17,64 @@ def rotate_martix(matrix:list) -> list:
     return r
 
 def keccak_f(state:list) -> list:
+    input_state = state
     for rnd in range(24):
         C = [0] *5
         for x in range(5):
             C[x] = state[x] ^ state[x+5] ^ state[x+10] ^ state[x+15] ^ state[x+20]
+            
+        handler.add_step(
+            f"Шаг θ, раунд {x}. Определение чётности столбца X", 
+            [
+                ["Формула:", "state[x] XOR state[x+5] XOR state[x+10] XOR state[x+15] XOR state[x+20]"],
+                ["Полученное значение:", f'{C[x]:b}']
+            ])
         for x in range(5):
             D = C[(x-1) % 5] ^ cycle_shift(C[(x+1) % 5], 1)
             for y in range(5):
                 state[x + 5*y] ^= D
+                handler.add_step(
+                                f"Шаг θ, раунд {x}. Влияние соседних столбцов", 
+                                [
+                                    ["Формула для маски:", "C[(x-1) % 5] XOR cycle_shift(C[(x+1) % 5], 1)"],
+                                    ["Маска:", f'{D:b}'],
+                                    ["Формула изменения состояния:", "state[x + 5*y] XOR D"],
+                                    ["Полученное значение:", f'{state[x + 5*y]:b}']
+                                ])
 
         B = [0] * 25
         for x in range(5):
             for y in range(5):
                 B[y+5*((2*x + 3*y) % 5)] = cycle_shift(state[x + 5*y], ROTATIONS[x][y])
+                handler.add_step(
+                    "Шаг ρ и π. Перемешивание массива байт",
+                    [
+                        ["Смешенная последовательность байт", f'{B[y+5*((2*x + 3*y) % 5)]:b}']
+                    ]
+                )
 
         for x in range(5):
             for y in range(5):
                 state[x + 5*y] = (B[x+5*y] ^ 
                                   (((~B[(x+1) % 5 + 5*y]) & MASK) & 
                                    B[(x+2) % 5 + 5*y])) & MASK
+                handler.add_step(
+                    "Нелинейное перемешивание по строкам",
+                    [
+                        [f"Состояние для x = {x}, y = {y}", f'{state[x + 5*y]:b}']
+                    ],
+                    str(state[x + 5*y])
+                )
         state[0] ^= RC[rnd]
+        handler.add_step(
+            f"Добавление раундовой константы для нарушения симметрии (раунд = {rnd})",
+            [
+                ["Формула:", "state[0] XOR RC[rnd]"]
+            ],
+            f'{state[0]:b}'
+            )
+
+    handler.add_step("Функция Keccak", [["Входные данные:", [f'{x:b}' for x in input_state]], "Количество раундов:", "24"], [f'{x:b}' for x in state])
 
     return state
 
@@ -41,6 +83,10 @@ def keccak(r,c, data, output_lenght, padding=0x06) -> bytes:
     r_bytes = r // 8
 
     msg = bytearray(data)
+    handler.add_step(
+        "Получение входных данных",
+        hash=str(msg.decode('utf-8'))
+        )
     msg.append(padding)
 
     # Дополняем массив байт до нужной длины
@@ -49,12 +95,24 @@ def keccak(r,c, data, output_lenght, padding=0x06) -> bytes:
 
     msg[-1] |= 0x80
 
+    handler.add_step(
+        "Дополнение массива байт до нужной длины",
+        hash=str(msg.hex())
+    )
     # Впитывание губочной функции
     for i in range(0, len(msg), r_bytes):
         block = msg[i:i + r_bytes] # формируем блок по N байт
         for j in range(r_bytes):
             state[j//8] ^= block[j] << (8 * (j % 8))
 
+            if(state[j//8] > 0):
+                handler.add_step(
+                    "Разбиение данных на блоки",
+                    [
+                        ["Формирование блока:", "state[j//8] XOR block[j] << (8 * (j % 8))"]
+                    ],
+                    f'{state[j//8]:b}'
+                )
         state = keccak_f(state)
 
     # Выжимка губочной функции
@@ -65,11 +123,19 @@ def keccak(r,c, data, output_lenght, padding=0x06) -> bytes:
                 break
 
             result.append((state[i//8] >> (8 * (i % 8))) & 0xFF)
+            handler.add_step(
+                "Выжимка губочной функции",
+                [
+                    ["Формуля добавления следующего числа бит:", "(state[i//8] >> (8 * (i % 8))) & 0xFF"]
+                ],
+                f'{result.hex()}'
+            )
 
         # Если результативная длина не достаточна, то вызываем функцию повторно
         if len(result) < output_lenght:
             state = keccak_f(state) 
 
+    handler.convert_steps()
     return bytes(result)
 
 MASK = (1 << 64) - 1
@@ -83,7 +149,7 @@ RC = [
     0x8000000080008081, 0x8000000000008080, 0x0000000080000001, 0x8000000080008008
 ]
 
-ROTATIONS = rotate_martix(RC)
+ROTATIONS = rotate_martix()
 
 def sha_256(data): return keccak(1088, 512, data, 32, 0x06)
 
