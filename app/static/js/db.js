@@ -59,4 +59,5 @@
       cell.dataset.s = cell.textContent.trim().toUpperCase();
     }
   });
+  window.addRow = addRow;
 })();

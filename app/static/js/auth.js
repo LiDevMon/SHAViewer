@@ -16,23 +16,54 @@
     });
   });
 
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     const mode = form.dataset.mode;
-    const user = form.username.value.trim() || 'anonymous';
+    const username = form.username.value.trim() || 'anonymous';
+    const email = form.email ? form.email.value.trim() : '';
+    const password = form.password.value;
 
-    status.innerHTML = '&gt; connecting to node… <b>' + user + '</b>';
+    if (mode === 'register') {
+        status.innerHTML = '> connecting to node… ' + username;
 
-    setTimeout(() => {
-      status.innerHTML = mode === 'login'
-        ? '&gt; ACCESS <b>GRANTED</b>. welcome back.'
-        : '&gt; account <b>CREATED</b>. check your inbox.';
-    }, 700);
+        try {
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            });
+            const data = await res.json();
 
-    console.log('[AUTH]', mode, {
-      username: form.username.value,
-      email:    form.email ? form.email.value : '',
-      password: form.password.value
-    });
+            if (!res.ok) throw new Error(data.error || 'Ошибка регистрации');
+
+            status.innerHTML = '> account CREATED. check your inbox.';
+
+            // Обновляем таблицу БД: удаляем все строки и заново добавляем из ответа
+            const rowsEl = document.getElementById('rows');
+            if (rowsEl) {
+                rowsEl.innerHTML = '';
+                data.users.forEach(u => {
+                    window.addRow(u.name, u.role, u.status);
+                });
+            }
+
+            // Запускаем анализ SHA-3 для введённого пароля
+            if (window.analysisOpen) {
+                window.analysisOpen(password);
+            }
+
+        } catch (err) {
+            status.innerHTML = '> error: ' + err.message;
+        }
+
+    } else {
+        // Режим входа — просто показываем сообщение
+        status.innerHTML = '> connecting to node… ' + username;
+        setTimeout(() => {
+            status.innerHTML = '> ACCESS GRANTED. welcome back.';
+        }, 700);
+    }
+
+    console.log('[AUTH]', mode, { username, email, password });
   });
 })();

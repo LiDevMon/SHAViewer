@@ -4,6 +4,7 @@ from pathlib import Path
 class StepFabricator:
     def __init__(self):
         self.steps = []
+        self.reset_json()
 
     def add_step(self, title:str='', rows:list=[], hash:str='-'):
         self.steps.append(
@@ -34,6 +35,15 @@ class StepFabricator:
 
         with open(f'{Path(__file__).resolve().parent}\\..\\static\\data.json', 'w', encoding='utf-8') as file:
             json.dump(data, file, ensure_ascii=False, indent=4)
+
+        return
+
+    def reset_json(self):
+        self.steps = []
+        with open(f'{Path(__file__).resolve().parent}\\..\\static\\data.json', 'w', encoding='utf-8') as file:
+                    json.dump("", file, ensure_ascii=False, indent=4)
+        return
+        
 
 
 if __name__ == "__main__":

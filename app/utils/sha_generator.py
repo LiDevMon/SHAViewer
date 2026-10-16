@@ -169,7 +169,9 @@ RC = [
 
 ROTATIONS = rotate_martix()
 
-def sha_256(data): return keccak(1088, 512, data, 32, 0x06)
+def sha_256(data):    
+    handler.reset_json()
+    return keccak(1088, 512, data, 32, 0x06)
 
 if __name__ == "__main__":
     from hashlib import sha3_256
